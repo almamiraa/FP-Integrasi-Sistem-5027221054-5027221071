@@ -5,6 +5,10 @@
 | Alma Amira Dewani | 5027221054 |
 | Khansa Adia Rahma | 5027221071 |
 
+## Video Pengerjaan
+
+Link youtube dapat diakses di https://youtu.be/FoBcejMRXw0
+
 ## Project 1
 
 ### Alat yang Digunakan
@@ -27,8 +31,8 @@
 
 // Update these with values suitable for your network.
 
-const char* ssid = " ";
-const char* pswd = " ";
+const char* ssid = "bee";
+const char* pswd = "ehvb2222";
 
 const char* mqtt_server = "167.172.87.186"; //Broker IP/URL
 const char* topic = "/kelompok3/room/temperature";
@@ -240,6 +244,12 @@ void loop() {
 
 ### Testing
 
+- setup alat
+  ![Setup p1](Dokum/project1.jpg)
+
+- hasil
+  ![Setup p1](Dokum/project1-1.png)
+
 ## Project 2
 
 ### Alat yang Digunakan
@@ -251,4 +261,78 @@ void loop() {
 - Kabel jumper
 - LED
 
+### Kode
+
+- Pub
+
+```
+import paho.mqtt.client as mqtt
+import json
+
+def on_connect(client, userdata, flags, rc):
+    # subscribe, which need to put into on_connect
+    # if reconnect after losing the connection with the broker, it will continue to subscribe to the raspberry/topic topic
+    client.subscribe("/kelompok3/room/temperature")
+
+# the callback function, it will be triggered when receiving messages
+def on_message(client, userdata, message):
+    readings=str(message.payload.decode("utf-8"))
+    print("message received " ,readings)
+    JsonReadings=json.loads(readings)
+    print("Temperature=",JsonReadings["Temp"])
+    if JsonReadings["Temp"]>15:
+        client.publish("/kelompok3/room/led","On")
+    else:
+        client.publish("/kelompok3/room/led","Off")
+
+client = mqtt.Client()
+client.on_connect = on_connect
+client.on_message = on_message
+# create connection, the three parameters are broker address, broker port number, and keep-alive time respectively
+# client.username_pw_set(username="",password="")
+client.connect("167.172.87.186", 1883, 60)
+# set the network loop blocking, it will not actively end the program before calling disconnect() or the program crash
+client.loop_forever()
+```
+
+- Sub
+
+```
+import paho.mqtt.client as mqtt
+import RPi.GPIO as GPIO # Import Raspberry Pi GPIO library
+from time import sleep # Import the sleep function from the time module
+
+GPIO.setwarnings(False) # Ignore warning for now
+GPIO.setmode(GPIO.BOARD) # Use physical pin numbering
+GPIO.setup(12, GPIO.OUT, initial=GPIO.LOW) # Set pin 8 to be an output pin and$
+
+def on_connect(client, userdata, flags, rc):
+    # subscribe, which need to put into on_connect
+    # if reconnect after losing the connection with the broker, it will continue to subscribe to the raspberry/topic topic
+    client.subscribe("/kelompok3/room/led")
+
+# the callback function, it will be triggered when receiving messages
+def on_message(client, userdata, message):
+    if str(message.payload.decode("utf-8"))=="On":
+        GPIO.output(12, GPIO.HIGH) # Turn on
+    else:
+        GPIO.output(12, GPIO.LOW) # Turn Off
+    print("message received " ,str(message.payload.decode("utf-8")))
+
+client = mqtt.Client()
+client.on_connect = on_connect
+client.on_message = on_message
+# create connection, the three parameters are broker address, broker port number, and keep-alive time respectively
+# client.username_pw_set(username="",password="")
+client.connect("167.172.87.186", 1883, 60)
+# set the network loop blocking, it will not actively end the program before calling disconnect() or the program crash
+client.loop_forever()
+```
+
 ### Testing
+
+- setup alat
+  ![Setup p1](Dokum/project2.jpg)
+
+- testing
+  ![Setup p1](Dokum/project2-2.png)

@@ -1,18 +1,17 @@
 #include <Adafruit_Sensor.h>
 #include <DHT.h>
 #include <DHT_U.h>
-#include <WiFi.h>
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
 
 
 // Update these with values suitable for your network.
 
-const char* ssid = " ";
-const char* pswd = " ";
+const char* ssid = "bee";
+const char* pswd = "ehvb2222";
 
 const char* mqtt_server = "167.172.87.186"; //Broker IP/URL
-const char* topic = "/kelompok3/room/temperature";   
+const char* topic = "/kelompok3/room/temperature";
 
 long timeBetweenMessages = 1000 * 20 * 1;
 
@@ -25,11 +24,11 @@ int status = WL_IDLE_STATUS;     // the starting Wifi radio's status
 
 
 
-#define DHTPIN 5     // Digital pin connected to the DHT sensor 
+#define DHTPIN 5     // Digital pin connected to the DHT sensor
 
 // Uncomment the type of sensor in use:
-#define DHTTYPE    DHT11    
-//#define DHTTYPE    DHT22     // DHT 22 (AM2302)
+//#define DHTTYPE    DHT11
+#define DHTTYPE    DHT22     // DHT 22 (AM2302)
 
 
 
@@ -136,7 +135,7 @@ void setup() {
   setup_wifi();
   client.setServer(mqtt_server, 1883);
   client.setCallback(callback);
-  
+
   Serial.println(F("DHTxx Unified Sensor Example"));
   // Print temperature sensor details.
   sensor_t sensor;
@@ -181,7 +180,7 @@ void loop() {
     temp=event.temperature;
   }
 
-  
+
   // Get humidity event and print its value.
   dht.humidity().getEvent(&event);
   float hum=0;
